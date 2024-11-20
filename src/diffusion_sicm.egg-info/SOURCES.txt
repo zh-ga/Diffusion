@@ -1,8 +1,0 @@
-setup.py
-diffusion/Diffusion.py
-diffusion/__init__.py
-diffusion_sicm.egg-info/PKG-INFO
-diffusion_sicm.egg-info/SOURCES.txt
-diffusion_sicm.egg-info/dependency_links.txt
-diffusion_sicm.egg-info/requires.txt
-diffusion_sicm.egg-info/top_level.txt

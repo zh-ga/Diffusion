@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "diffusion_sicm"
+version = "0.4.0"
+description = "Multilayer Chemical Vapor Deposition Diffusion Simulation"
+readme = "README.md"
+authors = [{name = "zh-ga"}]
+license = {text = "Private"}
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.21", "scipy>=1.7", "pyyaml>=6.0"]
+optional-dependencies = {fdm = ["numba>=0.55"]}
+
+[project.urls]
+Repository = "https://github.com/zh-ga/Diffusion"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]

@@ -26,7 +26,7 @@ A Python library for simulating dopant diffusion in multilayer semiconductor str
 ### Quick install from GitHub Release
 
 ```bash
-pip install https://github.com/zh-ga/Diffusion/releases/download/v0.5.1/diffusion_sicm-0.5.1-py3-none-any.whl
+pip install https://github.com/zh-ga/Diffusion/releases/download/v0.6.0/diffusion_sicm-0.6.0-py3-none-any.whl
 ```
 
 ### Install from source
@@ -245,7 +245,7 @@ with Neumann (zero-flux) boundary conditions at both ends.
 
 | diffusion_sicm | Python  | Numba        | NumPy       | SciPy       |
 |----------------|---------|--------------|-------------|-------------|
-| 0.5.1          | >= 3.10 | >= 0.55      | >= 1.21     | >= 1.7      |
+| 0.6.0          | >= 3.10 | >= 0.55      | >= 1.21     | >= 1.7      |
 
 ---
 

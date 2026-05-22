@@ -81,7 +81,11 @@ plt.ylabel("Concentration (cm^-3)")
 plt.show()
 ```
 
-### 3. Legacy erf solver (for reference)
+### 3. Results
+
+![FDM result](fdm_result.png)
+
+### 4. Legacy erf solver (for reference)
 
 ```python
 from diffusion import ML_CVD_Model_Erf
@@ -185,11 +189,11 @@ Concentration arrays `c1`, `c2` have N entries, one per layer.
 
 **Mode 0 — Arrhenius form:**
 
-`D(T) = D0 x 10^8 x exp(-Ea x e / (k x T))`
+$$D(T) = D_0 \times 10^{8} \times \exp\left(-\frac{E_a \cdot e}{k \cdot T}\right)$$
 
 **Mode 1 — Exponential form (relative to reference):**
 
-`D(T) = D0 x exp(Ea x (1/T - 1/Tref))`
+$$D(T) = D_0 \times \exp\left(E_a \cdot \left(\frac{1}{T} - \frac{1}{T_{ref}}\right)\right)$$
 
 ---
 
@@ -217,24 +221,25 @@ The erf solver treats each layer independently with fixed boundary concentration
 
 Fick's second law for one-dimensional diffusion:
 
-`dc/dt = D(T(t)) x d^2c/dx^2`
+$$
+\frac{\partial c}{\partial t} = D(T(t)) \frac{\partial^2 c}{\partial x^2}
+$$
 
 ### Analytical Solution (erf)
 
-For a diffusion couple with constant boundary concentrations cL and cR:
+For a diffusion couple with constant boundary concentrations $c_L$ and $c_R$:
 
-`c(x,t) = (cL + cR)/2 - (cL - cR)/2 x erf((x - x0) / (2 x sqrt(integral(D(t) dt))))`
+$$
+c(x, t) = \frac{c_L + c_R}{2} - \frac{c_L - c_R}{2} \cdot \operatorname{erf}\left(\frac{x - x_0}{2\sqrt{\int D(t) dt}}\right)
+$$
 
 ### Numerical Solution (FDM)
 
 Crank-Nicolson discretization:
 
-```
-(c_i^(n+1) - c_i^n) / dt = D/2 x (
-  (c_(i-1)^(n+1) - 2c_i^(n+1) + c_(i+1)^(n+1)) / dx^2
-  + (c_(i-1)^n - 2c_i^n + c_(i+1)^n) / dx^2
-)
-```
+$$
+\frac{c_i^{n+1} - c_i^n}{\Delta t} = \frac{D}{2} \left( \frac{c_{i-1}^{n+1} - 2c_i^{n+1} + c_{i+1}^{n+1}}{\Delta x^2} + \frac{c_{i-1}^{n} - 2c_i^{n} + c_{i+1}^{n}}{\Delta x^2} \right)
+$$
 
 with Neumann (zero-flux) boundary conditions at both ends.
 
@@ -245,37 +250,6 @@ with Neumann (zero-flux) boundary conditions at both ends.
 | diffusion_sicm | Python  | Numba        | NumPy       | SciPy       |
 |----------------|---------|--------------|-------------|-------------|
 | 0.5.1          | >= 3.10 | >= 0.55      | >= 1.21     | >= 1.7      |
-
----
-
-## Project Structure
-
-```
-diffusion_sicm/
-├── LICENSE
-├── README.md
-├── CONTRIBUTING.md          # Contribution guide
-├── pyproject.toml           # Build config + deps
-├── .gitignore
-├── .github/
-│   └── workflows/
-│       └── build.yml        # CI: test on push/PR, release on tag
-├── examples/
-│   ├── para_2layer.yaml     # Example: two-layer B/P diffusion in Si
-│   ├── para_3layer.yaml     # Example: three-layer config
-│   ├── run_erf.py
-│   └── run_fdm.py
-├── tests/
-│   └── test_diffusion.py    # 15+ tests covering API, physics, edge cases
-└── src/
-    └── diffusion/
-        ├── __init__.py       # Exports ML_CVD_Model, ML_CVD_FDM, ...
-        ├── _version.py       # v0.5.1
-        ├── _core.py          # ML_CVD_Model (FDM wrapper, backward compat)
-        ├── _erf.py           # ML_CVD_Model_Erf (legacy erf solver)
-        ├── _utils.py         # Shared utilities (interpolation, D calculation)
-        └── fdm.py            # ML_CVD_FDM (Numba JIT Crank-Nicolson)
-```
 
 ---
 

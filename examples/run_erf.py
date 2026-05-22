@@ -1,10 +1,9 @@
 """Example: Run the original analytical erf solver."""
-
 import matplotlib.pyplot as plt
 from diffusion import ML_CVD_Model
 
 model = ML_CVD_Model()
-model("para_3layer.yaml", dcal_type=0)
+model("para_2layer.yaml", dcal_type=0)
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 

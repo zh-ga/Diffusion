@@ -14,7 +14,7 @@ A Python library for simulating dopant diffusion in multilayer semiconductor str
 - **Backward compatible** — Same class name, same `__call__` signature, same output attributes
 - **Sequential layer deposition** — Grid grows progressively as each layer is deposited
 - **Adaptive time stepping** — Time step automatically adjusts to diffusion rate and growth rate
-- **Numba JIT acceleration** — Inner loops compiled for near-native performance (~3s for 400s process at 1nm resolution)
+- **Numba JIT acceleration** — Inner loops compiled for near-native performance
 - **Two-species diffusion** — Independent diffusion coefficients, activation energies, and concentration profiles
 - **Arbitrary thermal history** — Temperature profile defined by arbitrary time-temperature curve
 - **YAML configuration** — All process parameters in a single YAML file
@@ -43,24 +43,27 @@ pip install -e .
 
 ### 1. Prepare a YAML configuration file
 
+Create `para_2layer.yaml`:
+
 ```yaml
-# para_3layer.yaml
-layer: [4, 0.5, 6.2, 3.5]      # layer thicknesses (um)
-c1: [1.01e10, 1.01e10, 1.01e10, 1.01e10]  # species 1 conc. (cm^-3)
-c2: [3.48e19, 3.96e10, 2.88e16, 1.10e16]  # species 2 conc. (cm^-3)
-dep_t: [0, 30, 250, 400]        # deposition times (s)
+layer: [5, 3]                    # layer thicknesses (um)
+c1: [1.0e19, 1.0e15]            # species 1 conc. (cm^-3)
+c2: [5.0e19, 1.0e15]            # species 2 conc. (cm^-3)
+dep_t: [0, 100]                  # deposition time (s)
 
-d1_coff: 2.38                   # diffusion pre-factor (species 1)
-d1_temp_ref: 1120               # reference temperature (C)
-d1_exp_c: 3.60                  # activation energy (eV, dcal_type=0) or exponent
+d1_coff: 0.76                    # D0 for species 1 (cm^2/s)
+d1_temp_ref: 1100                # reference temperature (C)
+d1_exp_c: 3.46                   # activation energy (eV)
 
-d2_coff: 2.62                   # diffusion pre-factor (species 2)
-d2_temp_ref: 1120
-d2_exp_c: 3.62
+d2_coff: 3.85                    # D0 for species 2 (cm^2/s)
+d2_temp_ref: 1100
+d2_exp_c: 3.66
 
-step_temperature: [1110, 1110, 1110, 1110, 1110, 1110, 1110, 700]
-step_time: [0, 20, 30, 230, 250, 350, 370, 400]
+step_temperature: [1100, 1100]    # temperature profile (C)
+step_time: [0, 100]               # corresponding time points (s)
 ```
+
+*Diffusion parameters for Boron (species 1) and Phosphorus (species 2) in silicon are based on published literature values.*
 
 ### 2. Run solver
 
@@ -69,7 +72,7 @@ import matplotlib.pyplot as plt
 from diffusion import ML_CVD_Model
 
 model = ML_CVD_Model()
-model("para_3layer.yaml", dcal_type=0)
+model("para_2layer.yaml", dcal_type=0)
 
 plt.plot(model.x_position, model.c2_res, "r-")
 plt.yscale("log")
@@ -83,7 +86,7 @@ plt.show()
 ```python
 from diffusion import ML_CVD_Model_Erf
 model = ML_CVD_Model_Erf()
-model("para_3layer.yaml", dcal_type=0)
+model("para_2layer.yaml", dcal_type=0)
 ```
 
 ---
@@ -181,10 +184,12 @@ Concentration arrays `c1`, `c2` have N entries, one per layer.
 ### Diffusion Calculation Modes
 
 **Mode 0 — Arrhenius form:**
-$$D(T) = D_0 \\times 10^{8} \\times \\exp\\left(-\\frac{E_a \\cdot e}{k \\cdot T}\\right)$$
+
+`D(T) = D0 x 10^8 x exp(-Ea x e / (k x T))`
 
 **Mode 1 — Exponential form (relative to reference):**
-$$D(T) = D_0 \\times \\exp\\left(E_a \\cdot \\left(\\frac{1}{T} - \\frac{1}{T_{ref}}\\right)\\right)$$
+
+`D(T) = D0 x exp(Ea x (1/T - 1/Tref))`
 
 ---
 
@@ -198,29 +203,11 @@ $$D(T) = D_0 \\times \\exp\\left(E_a \\cdot \\left(\\frac{1}{T} - \\frac{1}{T_{r
 | Deposition model | Progressive grid growth | Instantaneous full-layer |
 | Grid adaptive | Yes (adaptive dt + r-value control) | No (fixed dx) |
 | JIT compiled | Yes (Numba) | No |
-| Computation time (400s) | ~3s (warm) | ~0.08s |
 | Physical accuracy | High | Moderate |
 
 ### Key Difference
 
-The erf solver treats each layer independently with fixed boundary concentrations at interfaces. This means the concentration at a given interface **does not evolve** once set. In contrast, the FDM solver solves the full PDE across the entire structure, allowing concentration at every point (including interfaces) to evolve continuously in response to diffusion from neighboring layers.
-
----
-
-## Benchmark Results
-
-Tested on `para_3layer.yaml` (400s process, dx = 1 nm):
-
-```
-Metric                              Original erf       FDM v2
-------------------------------------------------------------
-Computation time (s)                      0.0835       2.9957
-Grid points                               141999        10700
-C2 min (Layer 1 & 2)                  2.9285e+14   7.5589e+15
-C2 max (Layer 1 & 2)                  3.4791e+19   3.4791e+19
-```
-
-The large difference in C2 minimum (26x) is **physical** — the erf model's fixed low boundary concentration at the Layer 1/2 interface causes excessive depletion in Layer 1, while the FDM model correctly captures the continuous supply of dopant from Layer 2.
+The erf solver treats each layer independently with fixed boundary concentrations at interfaces. In contrast, the FDM solver solves the full PDE across the entire structure, allowing concentration at every point (including interfaces) to evolve continuously.
 
 ---
 
@@ -230,19 +217,24 @@ The large difference in C2 minimum (26x) is **physical** — the erf model's fix
 
 Fick's second law for one-dimensional diffusion:
 
-$$\\frac{\\partial c}{\\partial t} = D(T(t)) \\frac{\\partial^2 c}{\\partial x^2}$$
+`dc/dt = D(T(t)) x d^2c/dx^2`
 
 ### Analytical Solution (erf)
 
-For a diffusion couple with constant boundary concentrations $c_L$ and $c_R$:
+For a diffusion couple with constant boundary concentrations cL and cR:
 
-$$c(x, t) = \\frac{c_L + c_R}{2} - \\frac{c_L - c_R}{2} \\cdot \\operatorname{erf}\\left(\\frac{x - x_0}{2\\sqrt{\\int D(t) dt}}\\right)$$
+`c(x,t) = (cL + cR)/2 - (cL - cR)/2 x erf((x - x0) / (2 x sqrt(integral(D(t) dt))))`
 
 ### Numerical Solution (FDM)
 
 Crank-Nicolson discretization:
 
-$$\\frac{c_i^{n+1} - c_i^n}{\\Delta t} = \\frac{D}{2} \\left( \\frac{c_{i-1}^{n+1} - 2c_i^{n+1} + c_{i+1}^{n+1}}{\\Delta x^2} + \\frac{c_{i-1}^{n} - 2c_i^{n} + c_{i+1}^{n}}{\\Delta x^2} \\right)$$
+```
+(c_i^(n+1) - c_i^n) / dt = D/2 x (
+  (c_(i-1)^(n+1) - 2c_i^(n+1) + c_(i+1)^(n+1)) / dx^2
+  + (c_(i-1)^n - 2c_i^n + c_(i+1)^n) / dx^2
+)
+```
 
 with Neumann (zero-flux) boundary conditions at both ends.
 
@@ -252,7 +244,7 @@ with Neumann (zero-flux) boundary conditions at both ends.
 
 | diffusion_sicm | Python  | Numba        | NumPy       | SciPy       |
 |----------------|---------|--------------|-------------|-------------|
-| 0.4.0          | >= 3.10 | >= 0.55      | >= 1.21     | >= 1.7      |
+| 0.5.1          | >= 3.10 | >= 0.55      | >= 1.21     | >= 1.7      |
 
 ---
 
@@ -269,7 +261,8 @@ diffusion_sicm/
 │   └── workflows/
 │       └── build.yml        # CI: test on push/PR, release on tag
 ├── examples/
-│   ├── para_3layer.yaml
+│   ├── para_2layer.yaml     # Example: two-layer B/P diffusion in Si
+│   ├── para_3layer.yaml     # Example: three-layer config
 │   ├── run_erf.py
 │   └── run_fdm.py
 ├── tests/
@@ -277,7 +270,7 @@ diffusion_sicm/
 └── src/
     └── diffusion/
         ├── __init__.py       # Exports ML_CVD_Model, ML_CVD_FDM, ...
-        ├── _version.py       # v0.4.0
+        ├── _version.py       # v0.5.1
         ├── _core.py          # ML_CVD_Model (FDM wrapper, backward compat)
         ├── _erf.py           # ML_CVD_Model_Erf (legacy erf solver)
         ├── _utils.py         # Shared utilities (interpolation, D calculation)

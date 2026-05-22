@@ -1,10 +1,9 @@
 """Example: Run the finite difference (FDM) solver with Numba JIT."""
-
 import matplotlib.pyplot as plt
 from diffusion import ML_CVD_FDM
 
 model = ML_CVD_FDM()
-model("para_3layer.yaml", dcal_type=0, dx=1e-3)
+model("para_2layer.yaml", dcal_type=0, dx=1e-3)
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 

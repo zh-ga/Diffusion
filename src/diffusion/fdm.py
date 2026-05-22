@@ -77,8 +77,15 @@ def _evolve(
 
     for ilayer in range(n_layers):
         thick = layer[ilayer]
-        t_start = dep_t[ilayer]
-        t_end = dep_t[ilayer + 1] if ilayer + 1 < len(dep_t) else dep_t[-1]
+        if ilayer == 0:
+            t_start = dep_t[0]
+            t_end = dep_t[1]
+        elif ilayer < len(dep_t):
+            t_start = dep_t[ilayer - 1]
+            t_end = dep_t[ilayer]
+        else:
+            t_start = dep_t[-2]
+            t_end = dep_t[-1]
         t_rem = t_end - t_start
         if t_rem <= 0:
             continue
@@ -219,8 +226,12 @@ class ML_CVD_FDM:
         step_temperature = np.array(para_data["step_temperature"], dtype=np.float64)
         step_time = np.array(para_data["step_time"], dtype=np.float64)
 
-        pos = np.array([layer[:i].sum() for i in range(len(layer) + 1)])
-        pos = pos - pos[1]
+        # 构建层边界位置
+        # layer = [t0, t1, t2, t3] 对应厚度
+        # pos = [-t0, 0, t1, t1+t2, t1+t2+t3] 对应边界坐标
+        pos = np.array([-layer[0]] + [layer[1:i+1].sum() for i in range(1, len(layer))] + [layer[1:].sum()])
+        # 原始代码: pos = np.array([layer[:i].sum() for i in range(len(layer) + 1)])
+        # 原始代码: pos = pos - pos[1]  # 这个减 pos[1] 把 substrate 偏移到 0，然后最后一层被截断了
 
         n_layers = len(layer)
         total_thickness = pos[-1] - pos[0]

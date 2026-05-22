@@ -4,7 +4,7 @@ Test categories:
 - Basic model execution and API compatibility
 - Physical correctness (monotonicity, conservation)
 - Error handling for invalid inputs
-- Edge cases (zero thickness, single layer, etc.)
+- Edge cases
 - FDM vs erf cross-validation
 - Deprecated API compatibility
 """
@@ -21,7 +21,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
 from diffusion import ML_CVD_Model, ML_CVD_FDM, __version__
 
-YAML_PATH = os.path.join(os.path.dirname(__file__), "..", "examples", "para_3layer.yaml")
+# Use the simplified two-layer example (public academic parameters)
+YAML_PATH = os.path.join(os.path.dirname(__file__), "..", "examples", "para_2layer.yaml")
 
 
 def test_version_is_string():
@@ -62,11 +63,11 @@ def test_concentration_within_range():
     m(YAML_PATH, dcal_type=0, dx=1e-3)
     assert m.c1_res.min() > 0
     assert m.c2_res.min() > 0
-    assert m.c2_res.min() > 1e10
-    assert m.c2_res.max() < 1e22
+    assert m.c1_res.min() >= 1e14
+    assert m.c1_res.max() <= 1e20
 
 
-def test_no_concentration_at_boundary():
+def test_ml_cvd_model_has_same_shape_as_fdm():
     m1 = ML_CVD_Model()
     m2 = ML_CVD_FDM()
     m1(YAML_PATH, dcal_type=0)
@@ -110,12 +111,12 @@ def test_dcal_type_1_runs():
             "dep_t": [0, 10],
             "c1": [1e18, 1e14],
             "c2": [1e20, 1e15],
-            "d1_coff": 2.38,
-            "d1_temp_ref": 1120,
-            "d1_exp_c": 3.60,
-            "d2_coff": 2.62,
-            "d2_temp_ref": 1120,
-            "d2_exp_c": 3.62,
+            "d1_coff": 0.76,
+            "d1_temp_ref": 1100,
+            "d1_exp_c": 3.46,
+            "d2_coff": 3.85,
+            "d2_temp_ref": 1100,
+            "d2_exp_c": 3.66,
             "step_temperature": [1100, 1100],
             "step_time": [0, 10],
         }, f)
@@ -138,12 +139,12 @@ layer: [10]
 dep_t: [0, 100]
 c1: [1e18]
 c2: [1e16]
-d1_coff: 2.38
-d1_temp_ref: 1120
-d1_exp_c: 3.60
-d2_coff: 2.62
-d2_temp_ref: 1120
-d2_exp_c: 3.62
+d1_coff: 0.76
+d1_temp_ref: 1100
+d1_exp_c: 3.46
+d2_coff: 3.85
+d2_temp_ref: 1100
+d2_exp_c: 3.66
 step_temperature: [1100, 1100]
 step_time: [0, 100]
 """)
@@ -166,12 +167,12 @@ layer: [5, 5]
 dep_t: [0, 200]
 c1: [1e18, 1e14]
 c2: [1e20, 1e15]
-d1_coff: 2.38
-d1_temp_ref: 1120
-d1_exp_c: 3.60
-d2_coff: 2.62
-d2_temp_ref: 1120
-d2_exp_c: 3.62
+d1_coff: 0.76
+d1_temp_ref: 1100
+d1_exp_c: 3.46
+d2_coff: 3.85
+d2_temp_ref: 1100
+d2_exp_c: 3.66
 step_temperature: [1100, 1100]
 step_time: [0, 200]
 """)
@@ -214,9 +215,9 @@ def test_fdm_dt_used_positive():
 def test_fdm_D_attribute():
     m = ML_CVD_FDM()
     m(YAML_PATH, dcal_type=0, dx=1e-3)
-    assert len(m.D) == 4
+    assert len(m.D) == 2  # 2 layers in the example config
     for d_layer in m.D:
-        assert len(d_layer) == 2
+        assert len(d_layer) == 2  # D1, D2 for each layer
 
 
 if __name__ == "__main__":

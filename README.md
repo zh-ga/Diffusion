@@ -189,11 +189,15 @@ Concentration arrays `c1`, `c2` have N entries, one per layer.
 
 **Mode 0 — Arrhenius form:**
 
-$$D(T) = D_0 \times 10^{8} \times \exp\left(-\frac{E_a \cdot e}{k \cdot T}\right)$$
+$$
+D(T) = D_0 \times 10^{8} \exp\left(-\frac{E_a e}{kT}\right)
+$$
 
 **Mode 1 — Exponential form (relative to reference):**
 
-$$D(T) = D_0 \times \exp\left(E_a \cdot \left(\frac{1}{T} - \frac{1}{T_{ref}}\right)\right)$$
+$$
+D(T) = D_0 \exp\left(E_a \left(\frac{1}{T} - \frac{1}{T_{ref}}\right)\right)
+$$
 
 ---
 
@@ -230,7 +234,7 @@ $$
 For a diffusion couple with constant boundary concentrations $c_L$ and $c_R$:
 
 $$
-c(x, t) = \frac{c_L + c_R}{2} - \frac{c_L - c_R}{2} \cdot \operatorname{erf}\left(\frac{x - x_0}{2\sqrt{\int D(t) dt}}\right)
+c(x, t) = \frac{c_L + c_R}{2} - \frac{c_L - c_R}{2} \operatorname{erf}\left(\frac{x - x_0}{2\sqrt{\int D(t) dt}}\right)
 $$
 
 ### Numerical Solution (FDM)

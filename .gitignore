@@ -25,3 +25,4 @@ Thumbs.db
 .vscode/
 *.whl
 !fdm_result.png
+!docs/equations/*.svg

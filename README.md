@@ -189,15 +189,11 @@ Concentration arrays `c1`, `c2` have N entries, one per layer.
 
 **Mode 0 — Arrhenius form:**
 
-```math
-D(T) = D_0 \times 10^{8} \exp\left(-\frac{E_a e}{kT}\right)
-```
+![Arrhenius formula](docs/equations/arrhenius_formula.svg)
 
 **Mode 1 — Exponential form (relative to reference):**
 
-```math
-D(T) = D_0 \exp\left(E_a \left(\frac{1}{T} - \frac{1}{T_{ref}}\right)\right)
-```
+![Exponential formula](docs/equations/exponential_formula.svg)
 
 ---
 
@@ -225,17 +221,13 @@ The erf solver treats each layer independently with fixed boundary concentration
 
 Fick's second law for one-dimensional diffusion:
 
-```math
-\frac{\partial c}{\partial t} = D \frac{\partial^2 c}{\partial x^2}
-```
+![Fick's law](docs/equations/fick_law.svg)
 
 ### Analytical Solution (erf)
 
 For a diffusion couple with constant boundary concentrations $c_L$ and $c_R$:
 
-```math
-c(x, t) = \frac{c_L + c_R}{2} - \frac{c_L - c_R}{2} \operatorname{erf}\left(\frac{x - x_0}{2\sqrt{D_{int}}}\right)
-```
+![erf solution](docs/equations/erf_solution.svg)
 
 where $D_{int} = \int D(t) dt$ is the integrated diffusivity over the process time.
 
@@ -243,9 +235,7 @@ where $D_{int} = \int D(t) dt$ is the integrated diffusivity over the process ti
 
 Crank-Nicolson discretization:
 
-```math
-\frac{c_i^{n+1} - c_i^n}{\Delta t} = \frac{D}{2} \left( \frac{c_{i-1}^{n+1} - 2c_i^{n+1} + c_{i+1}^{n+1}}{\Delta x^2} + \frac{c_{i-1}^{n} - 2c_i^{n} + c_{i+1}^{n}}{\Delta x^2} \right)
-```
+![Crank-Nicolson](docs/equations/crank_nicolson.svg)
 
 with Neumann (zero-flux) boundary conditions at both ends.
 

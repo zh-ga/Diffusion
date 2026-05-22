@@ -26,7 +26,7 @@ A Python library for simulating dopant diffusion in multilayer semiconductor str
 ### Quick install from GitHub Release
 
 ```bash
-pip install https://github.com/zh-ga/Diffusion/releases/download/v0.5.0/diffusion_sicm-0.5.0-py3-none-any.whl
+pip install https://github.com/zh-ga/Diffusion/releases/download/v0.5.1/diffusion_sicm-0.5.1-py3-none-any.whl
 ```
 
 ### Install from source
@@ -35,8 +35,6 @@ pip install https://github.com/zh-ga/Diffusion/releases/download/v0.5.0/diffusio
 git clone https://github.com/zh-ga/Diffusion.git
 cd Diffusion
 pip install -e .
-# or with FDM extras:
-pip install -e ".[fdm]"
 ```
 
 ---

@@ -33,7 +33,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -e ".[fdm]"
+          pip install -e .
           pip install pytest
 
       - name: Run tests

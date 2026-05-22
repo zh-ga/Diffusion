@@ -9,15 +9,20 @@ OUTPUT_DIR = "docs/equations"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def render_latex(formula, filename, fontsize=18, figsize=None):
-    """Render a LaTeX formula to SVG file."""
+    """Render a LaTeX formula to SVG file with publication-quality fonts."""
+    plt.rcParams.update({
+        'font.family': 'serif',
+        'font.serif': ['STIXGeneral', 'DejaVu Serif', 'Times New Roman'],
+        'mathtext.fontset': 'stix',
+        'mathtext.default': 'rm',
+    })
     fig = plt.figure(figsize=figsize or (max(len(formula)*0.06, 3), 0.6))
     fig.text(0.02, 0.5, f"${formula}$", fontsize=fontsize,
-             ha='left', va='center',
-             bbox=dict(boxstyle='round,pad=0.3', facecolor='white', edgecolor='none'))
+             ha='left', va='center', color='black')
     plt.axis('off')
     filepath = os.path.join(OUTPUT_DIR, filename)
     plt.savefig(filepath, format='svg', bbox_inches='tight', pad_inches=0.1,
-                transparent=True)
+                transparent=True, dpi=300)
     plt.close()
     print(f"  Created: {filepath}")
 

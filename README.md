@@ -189,15 +189,15 @@ Concentration arrays `c1`, `c2` have N entries, one per layer.
 
 **Mode 0 — Arrhenius form:**
 
-```text
-D(T) = D0 x 10^8 x exp(-Ea x e / (k x T))
-```
+$$
+D(T) = D_0 \times 10^{8} \exp\left(-\frac{E_a e}{kT}\right)
+$$
 
 **Mode 1 — Exponential form (relative to reference):**
 
-```text
-D(T) = D0 x exp(Ea x (1/T − 1/Tref))
-```
+$$
+D(T) = D_0 \exp\left(E_a \left(\frac{1}{T} - \frac{1}{T_{ref}}\right)\right)
+$$
 
 ---
 
@@ -231,22 +231,21 @@ $$
 
 ### Analytical Solution (erf)
 
-For a diffusion couple with constant boundary concentrations cL and cR:
+For a diffusion couple with constant boundary concentrations $c_L$ and $c_R$:
 
-```text
-c(x,t) = (cL + cR)/2 − (cL − cR)/2 x erf((x − x0) / (2 x sqrt(integral(D dt))))
-```
+$$
+c(x, t) = \frac{c_L + c_R}{2} - \frac{c_L - c_R}{2} \operatorname{erf}\left(\frac{x - x_0}{2\sqrt{D_{int}t}}\right)
+$$
+
+where $D_{int} = \int D(t) dt$ is the integrated diffusivity over the process time.
 
 ### Numerical Solution (FDM)
 
 Crank-Nicolson discretization:
 
-```text
-(c_i^(n+1) − c_i^n) / Δt = D/2 x (
-  (c_(i-1)^(n+1) − 2c_i^(n+1) + c_(i+1)^(n+1)) / Δx^2
-  + (c_(i-1)^n − 2c_i^n + c_(i+1)^n) / Δx^2
-)
-```
+$$
+\frac{c_i^{n+1} - c_i^n}{\Delta t} = \frac{D}{2} \left( \frac{c_{i-1}^{n+1} - 2c_i^{n+1} + c_{i+1}^{n+1}}{\Delta x^2} + \frac{c_{i-1}^{n} - 2c_i^{n} + c_{i+1}^{n}}{\Delta x^2} \right)
+$$
 
 with Neumann (zero-flux) boundary conditions at both ends.
 

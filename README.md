@@ -10,8 +10,8 @@ A Python library for simulating dopant diffusion in multilayer semiconductor str
 
 ## Features
 
-- **Default FDM solver** (`ML_CVD_Model`) — Crank-Nicolson with progressive grid growth
-- **Backward compatible** — Same class name, same `__call__` signature, same output attributes
+- **Default FDM-based solver** (`ML_CVD_Model`) — Crank-Nicolson with progressive grid growth
+- **Backward compatible** — Same class name, same `__call__` signature, same output attributes; original import path `from diffusion.Diffusion import ML_CVD_Model` preserved
 - **Sequential layer deposition** — Grid grows progressively as each layer is deposited
 - **Adaptive time stepping** — Time step automatically adjusts to diffusion rate and growth rate
 - **Numba JIT acceleration** — Inner loops compiled for near-native performance
@@ -43,7 +43,7 @@ pip install -e .
 
 ### 1. Prepare a YAML configuration file
 
-Create `para_2layer.yaml`:
+Create a configuration file (see `examples/` for ready-to-use samples):
 
 ```yaml
 layer: [5, 3]                    # layer thicknesses (um)
@@ -83,6 +83,8 @@ plt.show()
 
 ### 3. Results
 
+The plot below was generated with `examples/run_fdm.py`:
+
 ![FDM result](fdm_result.png)
 
 ### 4. Legacy erf solver (for reference)
@@ -92,6 +94,8 @@ from diffusion import ML_CVD_Model_Erf
 model = ML_CVD_Model_Erf()
 model("para_2layer.yaml", dcal_type=0)
 ```
+
+> **Tip:** Try `examples/run_fdm.py` and `examples/run_erf.py` for runnable end-to-end scripts.
 
 ---
 
@@ -127,7 +131,7 @@ model(filepath, dcal_type=0, dx=1e-3)
 
 ### `ML_CVD_FDM`
 
-Improved finite difference solver using Crank-Nicolson scheme with Numba JIT.
+Low-level finite difference solver using Crank-Nicolson scheme with Numba JIT.
 
 ```python
 model = ML_CVD_FDM()
@@ -197,9 +201,29 @@ Concentration arrays `c1`, `c2` have N entries, one per layer.
 
 ---
 
+## Backward Compatibility
+
+Existing code using the original import path from the alpha version continues to work:
+
+```python
+from diffusion.Diffusion import ML_CVD_Model    # still works ✓
+```
+
+Both import paths (`from diffusion.Diffusion` and `from diffusion`) return the same class:
+
+```python
+from diffusion.Diffusion import ML_CVD_Model as A
+from diffusion import ML_CVD_Model as B
+assert A is B  # True
+```
+
+The deprecated `x_positon` attribute (typo from the alpha version) is still available but emits a `DeprecationWarning` — migrate to `x_position`.
+
+---
+
 ## Solver Comparison
 
-| Feature | `ML_CVD_Model` (default, FDM) | `ML_CVD_Model_Erf` (legacy) |
+| Feature | `ML_CVD_Model` (FDM-based, **recommended**) | `ML_CVD_Model_Erf` (legacy erf) |
 |---------|:---:|:---:|
 | Method | Crank-Nicolson FDM | Analytical erf solution |
 | Status | **Recommended** | Legacy reference only |
@@ -245,7 +269,7 @@ with Neumann (zero-flux) boundary conditions at both ends.
 
 | diffusion_sicm | Python  | Numba        | NumPy       | SciPy       |
 |----------------|---------|--------------|-------------|-------------|
-| 0.6.0          | >= 3.10 | >= 0.55      | >= 1.21     | >= 1.7      |
+| 0.6.0          | >= 3.9  | >= 0.55      | >= 1.21     | >= 1.7      |
 
 ---
 

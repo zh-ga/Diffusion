@@ -1,0 +1,22 @@
+# layer thicknesses (um)
+layer: [4, 0.5, 6.2, 3.5]
+# species 1 boundary concentrations (cm^-3)
+c1: [1.0126e10, 1.0126e10, 1.0126e10, 1.0126e10]
+# species 2 boundary concentrations (cm^-3)
+c2: [3.4791e19, 3.9604e10, 2.8849e16, 1.1001e16]
+# deposition time points (s)
+dep_t: [0, 30, 250, 400]
+
+# diffusion coefficient parameters (species 1)
+d1_coff: 2.38
+d1_temp_ref: 1120
+d1_exp_c: 3.60
+
+# diffusion coefficient parameters (species 2)
+d2_coff: 2.62
+d2_temp_ref: 1120
+d2_exp_c: 3.62
+
+# thermal history: temperature (C) at each time point
+step_temperature: [1110, 1110, 1110, 1110, 1110, 1110, 1110, 700]
+step_time: [0, 20, 30, 230, 250, 350, 370, 400]

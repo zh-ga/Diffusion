@@ -1,0 +1,28 @@
+
+build/
+dist/
+# Distribution
+.DS_Store
+*.egg-info/
+.env/
+# Environment
+# IDE
+.idea/
+# JIT cache
+*.log
+# OS
+# Output
+*.pdf
+*.png
+__pycache__/
+__pycache__/numba_cache/
+*.py[cod]
+# Python
+src/diffusion_sicm.egg-info/
+*.tar.gz
+Thumbs.db
+.venv/
+.vscode/
+*.whl
+!fdm_result.png
+!docs/equations/*.svg

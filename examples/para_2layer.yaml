@@ -1,0 +1,20 @@
+# Two-layer boron diffusion in silicon
+# Standard parameters based on published literature
+# Boron in Si: D0 = 0.76 cm^2/s, Ea = 3.46 eV
+# Dopant concentrations are normalized academic examples
+
+layer: [5, 3]                    # layer thickness (um)
+c1: [1.0e19, 1.0e15]            # species 1 conc. (cm^-3)
+c2: [5.0e19, 1.0e15]            # species 2 conc. (cm^-3)
+dep_t: [0, 100]                  # deposition time (s)
+
+d1_coff: 0.76                    # diffusion pre-factor (species 1)
+d1_temp_ref: 1100                # reference temperature (C)
+d1_exp_c: 3.46                   # activation energy (eV)
+
+d2_coff: 3.85                    # diffusion pre-factor (species 2)
+d2_temp_ref: 1100                # reference temperature (C)
+d2_exp_c: 3.66                   # activation energy (eV)
+
+step_temperature: [1100, 1100]    # thermal history (C)
+step_time: [0, 100]               # corresponding time (s)
